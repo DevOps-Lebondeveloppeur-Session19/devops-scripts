@@ -1,0 +1,26 @@
+# Define the name of the Docker Compose project
+name: redis-stack
+
+# Services section defines all the containers in the stack
+services:
+  # redis service definition
+  redis:
+    container_name: redis
+    image: redis:latest
+    restart: always
+    command: redis-server --requirepass pass-123
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-volume:/data
+    networks:
+      - backend-api-net
+
+# Volumes section defines named volumes for persistent data
+volumes:
+  redis-volume:
+
+# Networks section defines the networks used by the containers
+networks:
+  backend-api-net:
+    name: backend-api-net
