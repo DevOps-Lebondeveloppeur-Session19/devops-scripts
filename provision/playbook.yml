@@ -3,11 +3,11 @@
   hosts: all
   become: true
   roles:
-    #- docker
-    #- nginx
-    #- certbot
-    #- mongo
-    #- postgres
+    - docker
+    - nginx
+    - certbot
+    - mongo
+    - postgres
     - monitoring
 
    
