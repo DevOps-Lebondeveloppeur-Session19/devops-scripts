@@ -6,7 +6,9 @@ services:
   # postgres service definition
   postgres:
     container_name: postgres
-    image: postgres:latest
+    # Pin the major version. Never use :latest for a database — a re-provision
+    # can silently cross a major version (17 -> 18) and break the data layout.
+    image: postgres:18
     restart: always
     environment:
       - POSTGRES_USER=root
@@ -15,7 +17,9 @@ services:
     ports:
       - "5432:5432"
     volumes:
-      - postgres-volume:/var/lib/postgresql/data
+      # Postgres 18+ stores data in a version-specific subdir; mount the parent
+      # (/var/lib/postgresql), NOT /var/lib/postgresql/data.
+      - postgres-volume:/var/lib/postgresql
     networks:
       - backend-api-net
 

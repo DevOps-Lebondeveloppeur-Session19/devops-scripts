@@ -8,16 +8,31 @@
           - software-properties-common
         state: present
 
-    # Add Docker's official GPG key
-    - name: Add Docker's official GPG key
-      apt_key:
-        url: https://download.docker.com/linux/ubuntu/gpg
-        state: present
+    # Ensure the keyrings directory exists (apt-key is removed on modern Ubuntu/Debian)
+    - name: Create /etc/apt/keyrings directory
+      file:
+        path: /etc/apt/keyrings
+        state: directory
+        mode: "0755"
 
-    # Add Docker repository
+    # Add Docker's official GPG key (modern keyring approach, no apt-key)
+    - name: Add Docker's official GPG key
+      get_url:
+        url: https://download.docker.com/linux/ubuntu/gpg
+        dest: /etc/apt/keyrings/docker.asc
+        mode: "0644"
+
+    # Detect the target's architecture for the repo line
+    - name: Determine dpkg architecture
+      command: dpkg --print-architecture
+      register: dpkg_arch
+      changed_when: false
+
+    # Add Docker repository (references the key with signed-by)
     - name: Add Docker repository
       apt_repository:
-        repo: "deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release | lower }} stable"
+        repo: "deb [arch={{ dpkg_arch.stdout }} signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu {{ ansible_distribution_release | lower }} stable"
+        filename: docker
         state: present
 
     # Install Docker
