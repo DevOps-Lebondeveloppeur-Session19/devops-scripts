@@ -7,5 +7,6 @@
     - nginx
     - certbot
     - mongo
+    - monitoring
 
    
